@@ -47,3 +47,11 @@ locals {
   datadog_container_environment = jsonencode(var.datadog_container_environment)
 
 }
+
+output "envoy_dockerLabels" {
+  value = local.envoy_dockerLabels
+}
+
+output "envoy_container_environment" {
+  value = local.envoy_container_environment
+}

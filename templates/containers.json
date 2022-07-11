@@ -25,40 +25,36 @@
         }
     },
     {
-        {
-            "essential" : true,
-            "user" : "1337",
-            "memory" : 2048,
-            "name" : "envoy",
-            "cpu" : 2,
-            "taskRoleArn" : "${task_execution_role}",
-            "image" : "public.ecr.aws/appmesh/aws-appmesh-envoy:v1.21.1.2-prod",
-            "environment" : ${envoy_environment},
-            "healthCheck" : {
-              "retries" : 3,
-              "command" : [
-                "CMD-SHELL",
-                "curl -s http://localhost:9901/server_info | grep state | grep -q LIVE"
-              ],
-              "timeout" : 2,
-              "interval" : 5,
-              "startPeriod" : 10
-            },
-            "dockerLabels" : ${envoy_dockerLabels},
-            "logConfiguration" : {
-                "logConfiguration" : {
-                    "logDriver" : "awslogs",
-                    "options" : {
-                        "awslogs-group" : "${log_group}",
-                        "awslogs-region" : "${region}",
-                        "awslogs-stream-prefix" : "${awslogs-stream-prefix}"
-                    }
-                    }
-            },
-            "secrets" : [],
-            "portMappings" : [],
-          },
-          %{ if create_datadog }
+        "essential" : true,
+        "user" : "1337",
+        "memory" : 2048,
+        "name" : "envoy",
+        "cpu" : 2,
+        "taskRoleArn" : "${task_execution_role}",
+        "dockerLabels": ${envoy_dockerLabels},
+        "environment": ${envoy_environment},
+        "image" : "public.ecr.aws/appmesh/aws-appmesh-envoy:v1.21.1.2-prod",
+        "healthCheck" : {
+            "retries" : 3,
+            "command" : [
+            "CMD-SHELL",
+            "curl -s http://localhost:9901/server_info | grep state | grep -q LIVE"
+            ],
+            "timeout" : 2,
+            "interval" : 5,
+            "startPeriod" : 10
+        },
+        "logConfiguration" : {
+            "logDriver" : "awslogs",
+            "options" : {
+                "awslogs-group" : "${log_group}",
+                "awslogs-region" : "${region}",
+                "awslogs-stream-prefix" : "${awslogs-stream-prefix}"
+            }
+        },
+        "secrets" : [],
+        "portMappings" : []
+    %{ if create_datadog }
     },
     {
         "logConfiguration" : {
