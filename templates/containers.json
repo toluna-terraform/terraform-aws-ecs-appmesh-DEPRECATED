@@ -69,6 +69,7 @@
         "image": "${dd_image}",
         "memoryReservation": ${dd_memory},
         "cpu": ${dd_cpu},
+        "dockerLabels": ${dd_dockerLabels},
         "environment" : ${dd_environment},
         "portMappings" : [
             {

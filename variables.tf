@@ -171,6 +171,11 @@ variable "datadog_container_secrets" {
   default     = []
 }
 
+variable "datadog_dockerLabels" {
+  description = "A key/value map of labels to add to the container"
+  type        = map(string)
+  default     = {}
+}
 
 variable "envoy_app_ports" {
   description = "The app ports for envoy to listen to"

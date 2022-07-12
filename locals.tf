@@ -36,22 +36,10 @@ locals {
 
   dockerLabels                  = jsonencode(var.dockerLabels)
   app_container_environment     = jsonencode(var.app_container_environment)
-  envoy_dockerLabels            = [ for key in toset(["blue","green"]) :
-    jsonencode(var.envoy_dockerLabels)
-  ]
-  envoy_container_environment   = [ for key in toset(["blue","green"]) :
-    jsonencode(var.envoy_container_environment)
-  ]
+  envoy_dockerLabels            = jsonencode(var.envoy_dockerLabels)
+  envoy_container_environment   = jsonencode(var.envoy_container_environment)
   app_container_secrets         = jsonencode(var.app_container_secrets)
   datadog_container_secrets     = jsonencode(var.datadog_container_secrets)
   datadog_container_environment = jsonencode(var.datadog_container_environment)
-
-}
-
-output "envoy_dockerLabels" {
-  value = local.envoy_dockerLabels
-}
-
-output "envoy_container_environment" {
-  value = local.envoy_container_environment
+  datadog_dockerLabels          = jsonencode(var.datadog_dockerLabels)
 }
