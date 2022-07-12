@@ -219,3 +219,9 @@ variable "external_services" {
   type        = list(string)
   default     = []
 }
+
+variable "access_by_gateway_route" {
+  description = "Boolean which initiates if service is added to App mesh gatway"
+  type        = bool
+  default     = false
+}

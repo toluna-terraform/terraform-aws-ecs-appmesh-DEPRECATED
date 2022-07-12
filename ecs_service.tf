@@ -14,7 +14,7 @@ resource "aws_service_discovery_service" "net" {
 
 resource "aws_appmesh_virtual_router" "service" {
   name       = "vr-${var.app_name}-${var.environment}"
-  mesh_name  = "${var.environment}"
+  mesh_name  = "${var.app_mesh_name}"
   mesh_owner = "${var.app_mesh_owner}"
 
   spec {
@@ -30,7 +30,7 @@ resource "aws_appmesh_virtual_router" "service" {
 
 resource "aws_appmesh_virtual_service" "service" {
   name       = "${var.environment}.${var.namespace}"
-  mesh_name  = "${var.environment}"
+  mesh_name  = "${var.app_mesh_name}"
   mesh_owner = "${var.app_mesh_owner}"
 
   spec {
@@ -44,7 +44,7 @@ resource "aws_appmesh_virtual_service" "service" {
 
 resource "aws_appmesh_route" "net" {
   name                = "route-${var.app_name}-${var.environment}"
-  mesh_name           = "${var.environment}"
+  mesh_name           = "${var.app_mesh_name}"
   mesh_owner          = "${var.app_mesh_owner}"
   virtual_router_name = aws_appmesh_virtual_router.service.name
   spec {
@@ -108,4 +108,29 @@ deployment_circuit_breaker {
       task_definition,desired_count
     ]
   } */
+}
+
+resource "aws_appmesh_gateway_route" "net" {
+  count = var.access_by_gateway_route == true ? 1: 0
+  provider             = aws.app_mesh
+  name                 = "gw-${var.app_mesh_name}-${var.app_name}-${var.environment}-route"
+  mesh_name            = var.app_mesh_name
+  mesh_owner           = var.app_mesh_owner
+  virtual_gateway_name = "gw-${var.app_mesh_name}"
+
+  spec {
+    http_route {
+      action {
+        target {
+          virtual_service {
+            virtual_service_name = aws_appmesh_virtual_service.service.name
+          }
+        }
+      }
+
+      match {
+        prefix = var.environment == var.app_mesh_name ? "/${var.app_name}" : "/${var.environment}/${var.app_name}"
+      }
+    }
+  }
 }
