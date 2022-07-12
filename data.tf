@@ -24,6 +24,10 @@ data "aws_iam_policy_document" "appmesh_role_policy" {
 # current account id
 data "aws_caller_identity" "current" {}
 
+data "aws_ssm_parameter" "security_cidr" {
+  name = "/infra/tgw/route_cidr"
+}
+
 #check if initial image exists
 data "external" "current_service_image" {
   program = ["${path.module}/files/get_container_image.sh"]

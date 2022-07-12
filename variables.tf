@@ -202,3 +202,20 @@ variable "app_mesh_name" {
   description = "The mesh name"
   type = string
 }
+
+variable "app_mesh_env" {
+  description = "The mesh name"
+  type = string
+}
+
+variable "backends" {
+  description = "List of backends for ocastrator"
+  type        = list(string)
+  default     = []
+}
+
+variable "external_services" {
+  description = "List of external services for integrator"
+  type        = list(string)
+  default     = []
+}
