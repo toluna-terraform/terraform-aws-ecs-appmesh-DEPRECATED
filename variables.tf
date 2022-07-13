@@ -231,3 +231,9 @@ variable "access_by_gateway_route" {
   type        = bool
   default     = false
 }
+
+variable "region" {
+  description = "Boolean which initiates if service is added to App mesh gatway"
+  type        = string
+  default     = "us-east-1"
+}

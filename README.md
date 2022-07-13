@@ -10,6 +10,7 @@ This module creates an ECS cluster, ECS service, Task definition and IAM role fo
 module "ecs" {
   source                = "toluna-terraform/ecs-appmesh/aws"
   version               = "~>0.0.1" // Change to the required version.
+  region                        = local.region
   app_name                      = local.app_name
   environment                   = local.env_name
   env_type                      = local.env_vars.env_type
@@ -43,6 +44,8 @@ module "ecs" {
 }
 ```
 ## Requirements
+
+No requirements.
 
 No requirements.
 
@@ -132,6 +135,7 @@ No modules.
 | <a name="input_integrator_external_services"></a> [integrator\_external\_services](#input\_integrator\_external\_services) | Additional policies to be added to the IAM role | `list(string)` | `[]` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The app namespac | `string` | n/a | yes |
 | <a name="input_namespace_id"></a> [namespace\_id](#input\_namespace\_id) | The app namespace id | `string` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | Boolean which initiates if service is added to App mesh gatway | `string` | `"us-east-1"` | no |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | Subnet IDs used in Service | `list(string)` | `null` | no |
 | <a name="input_task_definition_cpu"></a> [task\_definition\_cpu](#input\_task\_definition\_cpu) | Task definition CPU | `number` | `2048` | no |
 | <a name="input_task_definition_memory"></a> [task\_definition\_memory](#input\_task\_definition\_memory) | Task definition memory | `number` | `4096` | no |
