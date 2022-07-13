@@ -134,3 +134,63 @@ resource "aws_appmesh_gateway_route" "net" {
     }
   }
 }
+
+resource "aws_appmesh_virtual_router" "integrator" {
+  for_each  = toset(var.integrator_external_services)
+  name      = "vr-${split(".", each.key)[0]}-${var.environment}"
+  mesh_name = var.environment
+
+  spec {
+    listener {
+      port_mapping {
+        port     = 80
+        protocol = "http"
+      }
+    }
+  }
+}
+
+resource "aws_appmesh_virtual_service" "integrator" {
+  for_each  = toset(var.integrator_external_services)
+  name      = "${each.key}"
+  mesh_name = var.environment
+
+  spec {
+    provider {
+      virtual_router {
+        virtual_router_name = aws_appmesh_virtual_router.integrator[each.key].name
+      }
+    }
+  }
+}
+
+resource "aws_appmesh_route" "integrators" {
+  for_each  = toset(var.integrator_external_services)
+  name                = "route-${split(".", each.key)[0]}-${var.environment}"
+  mesh_name           = var.environment
+  virtual_router_name = aws_appmesh_virtual_router.integrator[each.key].name
+  spec {
+    http_route {
+      match {
+        prefix = "/"
+      }
+
+      action {
+        weighted_target {
+          virtual_node = "vn-integrator-${var.environment}-green"
+          weight       = 100
+        }
+        weighted_target {
+          virtual_node = "vn-integrator-${var.environment}-blue"
+          weight       = 0
+        }
+      }
+    }
+  }
+  # Ignoring changes made by code_deploy controller
+  lifecycle {
+    ignore_changes = [
+      spec[0].http_route[0].action
+    ]
+  }
+}
