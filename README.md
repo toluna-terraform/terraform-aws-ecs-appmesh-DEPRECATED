@@ -36,6 +36,10 @@ module "ecs" {
   task_definition_cpu           = 512
   task_definition_memory        = 2048
   app_container_memory          = 2048
+  backends                      = local.env_vars.backends #list of backends for the service
+  external_services             = local.env_vars.external_services #list of external service
+  access_by_gateway_route       = true # create a route to the app mesh gateway
+  integrator_external_services  = local.env_vars.external_services # list of external services (accessed by nginx with nat)
 }
 ```
 ## Requirements
