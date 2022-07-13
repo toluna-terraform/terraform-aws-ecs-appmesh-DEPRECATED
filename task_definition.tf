@@ -2,7 +2,7 @@
 
 resource "aws_appmesh_virtual_node" "td_net" {
   for_each   = toset(["blue", "green"])
-  name       = "vn-${var.app_name}-${var.environment}-${each.key}"
+  name       = "vn-${var.app_name}-${var.env_name}-${each.key}"
   mesh_name  = var.app_mesh_name
   mesh_owner = "${var.app_mesh_owner}"
   spec {
@@ -32,7 +32,7 @@ resource "aws_appmesh_virtual_node" "td_net" {
 
     service_discovery {
       aws_cloud_map {
-        service_name   = var.environment
+        service_name   = var.env_name
         namespace_name = var.namespace
       }
     }
@@ -50,7 +50,7 @@ resource "aws_appmesh_virtual_node" "td_net" {
 
 resource "aws_ecs_task_definition" "task_definition" {
   for_each = toset(["blue","green"])
-  family                   = "${var.app_name}-${var.environment}-${each.key}"
+  family                   = "${var.app_name}-${var.env_name}-${each.key}"
   task_role_arn            = aws_iam_role.ecs_task_execution_role.arn
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"

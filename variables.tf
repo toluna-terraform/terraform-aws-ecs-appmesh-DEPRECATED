@@ -4,8 +4,8 @@ variable "app_name" {
   type        = string
 }
 
-variable "environment" {
-  description = "environment"
+variable "env_name" {
+  description = "environment name"
   type        = string
 }
 

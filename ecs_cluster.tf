@@ -1,3 +1,3 @@
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "${var.app_name}-${var.environment}"
+  name = "${var.app_name}-${var.env_name}"
 }

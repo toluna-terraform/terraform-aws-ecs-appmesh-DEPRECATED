@@ -1,5 +1,5 @@
 resource "aws_service_discovery_service" "net" {
-  name = "${var.environment}"
+  name = "${var.env_name}"
   dns_config {
     namespace_id = var.namespace_id
     dns_records {
@@ -13,7 +13,7 @@ resource "aws_service_discovery_service" "net" {
 }
 
 resource "aws_appmesh_virtual_router" "service" {
-  name       = "vr-${var.app_name}-${var.environment}"
+  name       = "vr-${var.app_name}-${var.env_name}"
   mesh_name  = "${var.app_mesh_name}"
   mesh_owner = "${var.app_mesh_owner}"
 
@@ -29,7 +29,7 @@ resource "aws_appmesh_virtual_router" "service" {
 
 
 resource "aws_appmesh_virtual_service" "service" {
-  name       = "${var.environment}.${var.namespace}"
+  name       = "${var.env_name}.${var.namespace}"
   mesh_name  = "${var.app_mesh_name}"
   mesh_owner = "${var.app_mesh_owner}"
 
@@ -43,7 +43,7 @@ resource "aws_appmesh_virtual_service" "service" {
 }
 
 resource "aws_appmesh_route" "net" {
-  name                = "route-${var.app_name}-${var.environment}"
+  name                = "route-${var.app_name}-${var.env_name}"
   mesh_name           = "${var.app_mesh_name}"
   mesh_owner          = "${var.app_mesh_owner}"
   virtual_router_name = aws_appmesh_virtual_router.service.name
@@ -55,11 +55,11 @@ resource "aws_appmesh_route" "net" {
 
       action {
         weighted_target {
-          virtual_node = "vn-${var.app_name}-${var.environment}-green"
+          virtual_node = "vn-${var.app_name}-${var.env_name}-green"
           weight       = 100
         }
         weighted_target {
-          virtual_node = "vn-${var.app_name}-${var.environment}-blue"
+          virtual_node = "vn-${var.app_name}-${var.env_name}-blue"
           weight       = 0
         }
       }
@@ -113,7 +113,7 @@ deployment_circuit_breaker {
 resource "aws_appmesh_gateway_route" "net" {
   count = var.access_by_gateway_route == true ? 1: 0
   provider             = aws.app_mesh
-  name                 = "gw-${var.app_mesh_name}-${var.app_name}-${var.environment}-route"
+  name                 = "gw-${var.app_mesh_name}-${var.app_name}-${var.env_name}-route"
   mesh_name            = var.app_mesh_name
   mesh_owner           = var.app_mesh_owner
   virtual_gateway_name = "gw-${var.app_mesh_name}"
@@ -129,7 +129,7 @@ resource "aws_appmesh_gateway_route" "net" {
       }
 
       match {
-        prefix = var.environment == var.app_mesh_name ? "/${var.app_name}" : "/${var.environment}/${var.app_name}"
+        prefix = var.env_name == var.app_mesh_name ? "/${var.app_name}" : "/${var.env_name}/${var.app_name}"
       }
     }
   }
@@ -137,8 +137,8 @@ resource "aws_appmesh_gateway_route" "net" {
 
 resource "aws_appmesh_virtual_router" "integrator" {
   for_each  = toset(var.integrator_external_services)
-  name      = "vr-${split(".", each.key)[0]}-${var.environment}"
-  mesh_name = var.environment
+  name      = "vr-${split(".", each.key)[0]}-${var.env_name}"
+  mesh_name = var.env_name
 
   spec {
     listener {
@@ -153,7 +153,7 @@ resource "aws_appmesh_virtual_router" "integrator" {
 resource "aws_appmesh_virtual_service" "integrator" {
   for_each  = toset(var.integrator_external_services)
   name      = "${each.key}"
-  mesh_name = var.environment
+  mesh_name = var.env_name
 
   spec {
     provider {
@@ -166,8 +166,8 @@ resource "aws_appmesh_virtual_service" "integrator" {
 
 resource "aws_appmesh_route" "integrators" {
   for_each  = toset(var.integrator_external_services)
-  name                = "route-${split(".", each.key)[0]}-${var.environment}"
-  mesh_name           = var.environment
+  name                = "route-${split(".", each.key)[0]}-${var.env_name}"
+  mesh_name           = var.env_name
   virtual_router_name = aws_appmesh_virtual_router.integrator[each.key].name
   spec {
     http_route {
@@ -177,11 +177,11 @@ resource "aws_appmesh_route" "integrators" {
 
       action {
         weighted_target {
-          virtual_node = "vn-integrator-${var.environment}-green"
+          virtual_node = "vn-integrator-${var.env_name}-green"
           weight       = 100
         }
         weighted_target {
-          virtual_node = "vn-integrator-${var.environment}-blue"
+          virtual_node = "vn-integrator-${var.env_name}-blue"
           weight       = 0
         }
       }

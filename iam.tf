@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "role-ecs-${var.app_name}-${var.environment}"
+  name               = "role-ecs-${var.app_name}-${var.env_name}"
   assume_role_policy = <<EOF
 {
  "Version": "2012-10-17",
@@ -43,7 +43,7 @@ resource "aws_iam_role_policy_attachment" "envoy-policy-attachment" {
 }
 
 resource "aws_iam_role_policy" "app_mesh_policy" {
-  name = "policy-appmesh-${var.app_name}-${var.environment}-${var.env_type}"
+  name = "policy-appmesh-${var.app_name}-${var.env_name}-${var.env_type}"
   role = aws_iam_role.ecs_task_execution_role.name
   policy = data.aws_iam_policy_document.appmesh_role_policy.json
 }
