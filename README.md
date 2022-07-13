@@ -38,7 +38,6 @@ module "ecs" {
   app_container_memory          = 2048
 }
 ```
-
 ## Requirements
 
 No requirements.
@@ -48,6 +47,7 @@ No requirements.
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_aws.app_mesh"></a> [aws.app\_mesh](#provider\_aws.app\_mesh) | n/a |
 | <a name="provider_external"></a> [external](#provider\_external) | n/a |
 | <a name="provider_template"></a> [template](#provider\_template) | n/a |
 
@@ -59,9 +59,13 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [aws_appmesh_gateway_route.net](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appmesh_gateway_route) | resource |
+| [aws_appmesh_route.integrators](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appmesh_route) | resource |
 | [aws_appmesh_route.net](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appmesh_route) | resource |
 | [aws_appmesh_virtual_node.td_net](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appmesh_virtual_node) | resource |
+| [aws_appmesh_virtual_router.integrator](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appmesh_virtual_router) | resource |
 | [aws_appmesh_virtual_router.service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appmesh_virtual_router) | resource |
+| [aws_appmesh_virtual_service.integrator](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appmesh_virtual_service) | resource |
 | [aws_appmesh_virtual_service.service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appmesh_virtual_service) | resource |
 | [aws_ecs_cluster.ecs_cluster](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster) | resource |
 | [aws_ecs_service.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service) | resource |
@@ -87,6 +91,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_access_by_gateway_route"></a> [access\_by\_gateway\_route](#input\_access\_by\_gateway\_route) | Boolean which initiates if service is added to App mesh gatway | `bool` | `false` | no |
 | <a name="input_app_container_cpu"></a> [app\_container\_cpu](#input\_app\_container\_cpu) | Default container cpu | `number` | `2` | no |
 | <a name="input_app_container_environment"></a> [app\_container\_environment](#input\_app\_container\_environment) | The environment variables to pass to a container | `list(map(string))` | `[]` | no |
 | <a name="input_app_container_image"></a> [app\_container\_image](#input\_app\_container\_image) | App container image | `string` | n/a | yes |
@@ -120,6 +125,7 @@ No modules.
 | <a name="input_envoy_dockerLabels"></a> [envoy\_dockerLabels](#input\_envoy\_dockerLabels) | A key/value map of labels to add to the container | `map(string)` | `{}` | no |
 | <a name="input_external_services"></a> [external\_services](#input\_external\_services) | List of external services for integrator | `list(string)` | `[]` | no |
 | <a name="input_iam_role_additional_policies"></a> [iam\_role\_additional\_policies](#input\_iam\_role\_additional\_policies) | Additional policies to be added to the IAM role | `list(string)` | `[]` | no |
+| <a name="input_integrator_external_services"></a> [integrator\_external\_services](#input\_integrator\_external\_services) | Additional policies to be added to the IAM role | `list(string)` | `[]` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The app namespac | `string` | n/a | yes |
 | <a name="input_namespace_id"></a> [namespace\_id](#input\_namespace\_id) | The app namespace id | `string` | n/a | yes |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | Subnet IDs used in Service | `list(string)` | `null` | no |
