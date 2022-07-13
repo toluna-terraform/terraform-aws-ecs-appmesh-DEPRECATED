@@ -7,7 +7,7 @@
         "image" : "${image}",
         "taskRoleArn" : "${task_execution_role}",
         "dockerLabels": ${dockerLabels},
-        "environment": ${env_name},
+        "environment": ${environment},
         "secrets" : ${secrets},
         "portMappings" : [
         {
@@ -32,7 +32,7 @@
         "cpu" : 2,
         "taskRoleArn" : "${task_execution_role}",
         "dockerLabels": ${envoy_dockerLabels},
-        "environment": ${envoy_env_name},
+        "environment": ${envoy_environment},
         "image" : "public.ecr.aws/appmesh/aws-appmesh-envoy:v1.21.1.2-prod",
         "healthCheck" : {
             "retries" : 3,
@@ -70,7 +70,7 @@
         "memoryReservation": ${dd_memory},
         "cpu": ${dd_cpu},
         "dockerLabels": ${dd_dockerLabels},
-        "environment" : ${dd_env_name},
+        "environment" : ${dd_environment},
         "portMappings" : [
             {
             "hostPort" : ${dd_container_port},
