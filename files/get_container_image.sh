@@ -16,7 +16,15 @@ if [[ $is_local != "false" ]];then
         IMAGE="NULL"
     }
 else
-    IMAGE=$(aws ecr describe-images --repository-name "$XAPP_NAME-main" --image-ids=imageTag=$IMAGE_TAG; echo "has_tag" || aws ecr describe-images --repository-name "$XAPP_NAME-main" --image-ids=imageTag=latest; echo "is_latest" || echo "NULL")
+    {
+        aws ecr describe-images --repository-name "$XAPP_NAME-main" --image-ids=imageTag=$IMAGE_TAG
+        IMAGE="has_tag"
+        } || {
+        aws ecr describe-images --repository-name "$XAPP_NAME-main" --image-ids=imageTag=latest
+        IMAGE="is_latest"
+        } || {
+        IMAGE="NULL"
+    }
 fi
 if [[ $IMAGE == "has_tag" ]]; then
     jq -n --arg image "$XIMAGE_NAME" '{ "image": $image }'
