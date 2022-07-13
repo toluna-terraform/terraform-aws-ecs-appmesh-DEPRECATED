@@ -52,7 +52,7 @@ data "template_file" "default-container" {
     task_execution_role   = aws_iam_role.ecs_task_execution_role.arn
     name                  = "${var.app_name}-${var.env_name}"
     image                 = data.external.current_service_image.result.image
-    env_name              = local.app_container_environment == "[]" ? "null" : local.app_container_environment
+    environment           = local.app_container_environment == "[]" ? "null" : local.app_container_environment
     envoy_environment     = local.envoy_container_environment == "[]" ? "null" : local.envoy_container_environment
     secrets               = local.app_container_secrets == "[]" ? "null" : local.app_container_secrets
     awslogs-stream-prefix = "awslogs-${var.app_name}-pref"
