@@ -143,6 +143,7 @@ resource "aws_appmesh_virtual_router" "integrator" {
   for_each  = toset(var.integrator_external_services)
   name      = "vr-${split(".", each.key)[0]}-${var.env_name}"
   mesh_name = var.env_name
+  mesh_owner = var.app_mesh_owner
 
   spec {
     listener {
@@ -158,7 +159,7 @@ resource "aws_appmesh_virtual_service" "integrator" {
   for_each  = toset(var.integrator_external_services)
   name      = "${each.key}"
   mesh_name = var.env_name
-
+  mesh_owner = var.app_mesh_owner
   spec {
     provider {
       virtual_router {
@@ -172,6 +173,7 @@ resource "aws_appmesh_route" "integrators" {
   for_each  = toset(var.integrator_external_services)
   name                = "route-${split(".", each.key)[0]}-${var.env_name}"
   mesh_name           = var.env_name
+  mesh_owner          = var.app_mesh_owner 
   virtual_router_name = aws_appmesh_virtual_router.integrator[each.key].name
   spec {
     http_route {
