@@ -235,7 +235,7 @@ resource "aws_appmesh_virtual_node" "td_net" {
       for_each = var.backends
       content {
         virtual_service {
-          virtual_service_name = "${backend.value}.${var.app_mesh_name}.${var.app_mesh_env}.local"
+          virtual_service_name = "${backend.value}.${var.app_mesh_name}.${var.tribe_name}.local"
         }
       }
     }
@@ -388,4 +388,10 @@ resource "aws_iam_role_policy" "datadog_policy" {
       }
     ]
   })
+}
+
+provider "aws" {
+  alias   = "app_mesh"
+  profile = "${var.app_mesh_env}"
+  region = var.region
 }
