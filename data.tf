@@ -68,10 +68,3 @@ data "template_file" "default-container" {
     dd_dockerLabels       = local.datadog_dockerLabels == "{}" ? "null" : local.datadog_dockerLabels
   }
 }
-
-
-provider "aws" {
-  alias   = "app_mesh"
-  profile = "${var.app_mesh_env}"
-  region = var.region
-}
