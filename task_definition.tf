@@ -34,6 +34,10 @@ resource "aws_appmesh_virtual_node" "td_net" {
       aws_cloud_map {
         service_name   = var.env_name
         namespace_name = var.namespace
+        
+        attributes = {
+          "ECS_SERVICE_NAME" = "${var.app_name}-${each.key}"
+        }
       }
     }
 
