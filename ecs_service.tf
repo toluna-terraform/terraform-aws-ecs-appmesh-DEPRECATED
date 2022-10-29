@@ -49,7 +49,7 @@ resource "aws_appmesh_route" "main-route" {
   mesh_owner          = "${var.app_mesh_owner}"
   virtual_router_name = aws_appmesh_virtual_router.service.name
   spec {
-    priority = 1
+    priority = 2
     http_route {
       match {
         prefix = "/"
@@ -86,7 +86,7 @@ resource "aws_appmesh_route" "test-route" {
   virtual_router_name = aws_appmesh_virtual_router.service.name
   spec {
     # this route is for testing, and will have an additional header
-    priority = 0
+    priority = 1
     http_route {
       match {
         prefix = "/"
@@ -116,7 +116,7 @@ resource "aws_appmesh_route" "test-route" {
   # Ignoring changes made by code_deploy controller
   lifecycle {
     ignore_changes = [
-      spec[0].http_route[0].action
+      spec[0].http_route[1].action
     ]
   }
 }
