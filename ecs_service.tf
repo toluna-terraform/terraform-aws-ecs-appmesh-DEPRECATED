@@ -116,7 +116,7 @@ resource "aws_appmesh_route" "test-route" {
   # Ignoring changes made by code_deploy controller
   lifecycle {
     ignore_changes = [
-      spec[0].http_route[1].action
+      spec[0].http_route[0].action
     ]
   }
 }
