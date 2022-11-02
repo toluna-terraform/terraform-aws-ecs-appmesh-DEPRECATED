@@ -3,7 +3,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 }
 
 resource "aws_service_discovery_service" "net" {
-  name = "${var.env_name}"
+  name = var.env_name
   dns_config {
     namespace_id = var.namespace_id
     dns_records {
@@ -18,8 +18,8 @@ resource "aws_service_discovery_service" "net" {
 
 resource "aws_appmesh_virtual_router" "service" {
   name       = "vr-${var.app_name}-${var.env_name}"
-  mesh_name  = "${var.app_mesh_name}"
-  mesh_owner = "${var.app_mesh_owner}"
+  mesh_name  = var.app_mesh_name
+  mesh_owner = var.app_mesh_owner
 
   spec {
     listener {
@@ -34,8 +34,8 @@ resource "aws_appmesh_virtual_router" "service" {
 
 resource "aws_appmesh_virtual_service" "service" {
   name       = "${var.env_name}.${var.namespace}"
-  mesh_name  = "${var.app_mesh_name}"
-  mesh_owner = "${var.app_mesh_owner}"
+  mesh_name  = var.app_mesh_name
+  mesh_owner = var.app_mesh_owner
 
   spec {
     provider {
@@ -48,8 +48,8 @@ resource "aws_appmesh_virtual_service" "service" {
 
 resource "aws_appmesh_route" "net" {
   name                = "route-${var.app_name}-${var.env_name}"
-  mesh_name           = "${var.app_mesh_name}"
-  mesh_owner          = "${var.app_mesh_owner}"
+  mesh_name           = var.app_mesh_name
+  mesh_owner          = var.app_mesh_owner
   virtual_router_name = aws_appmesh_virtual_router.service.name
   spec {
     http_route {
@@ -82,10 +82,10 @@ resource "aws_appmesh_route" "net" {
 
 
 resource "aws_ecs_service" "main" {
-  for_each = toset(["blue","green"])
+  for_each            = toset(["blue", "green"])
   name                = "${var.app_name}-${each.key}"
   cluster             = aws_ecs_cluster.ecs_cluster.id
-  task_definition     = aws_ecs_task_definition.task_definition[each.key].arn
+  task_definition     = aws_ecs_task_definition.task_definition.arn
   launch_type         = "FARGATE"
   scheduling_strategy = "REPLICA"
   desired_count       = each.key == "green" ? var.ecs_service_desired_count : 0
@@ -101,10 +101,10 @@ resource "aws_ecs_service" "main" {
     registry_arn = aws_service_discovery_service.net.arn
   }
 
-deployment_circuit_breaker {
-  enable = true
-  rollback = false
-}
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = false
+  }
 
   # Ignoring changes made by code_deploy controller
   /* lifecycle {
@@ -115,7 +115,7 @@ deployment_circuit_breaker {
 }
 
 resource "aws_appmesh_gateway_route" "net" {
-  count = var.access_by_gateway_route == true ? 1: 0
+  count                = var.access_by_gateway_route == true ? 1 : 0
   provider             = aws.app_mesh
   name                 = "gw-${var.app_mesh_name}-${var.app_name}-${var.env_name}-route"
   mesh_name            = var.app_mesh_name
@@ -156,7 +156,7 @@ resource "aws_appmesh_virtual_router" "integrator" {
 
 resource "aws_appmesh_virtual_service" "integrator" {
   for_each  = toset(var.integrator_external_services)
-  name      = "${each.key}"
+  name      = each.key
   mesh_name = var.env_name
 
   spec {
@@ -169,7 +169,7 @@ resource "aws_appmesh_virtual_service" "integrator" {
 }
 
 resource "aws_appmesh_route" "integrators" {
-  for_each  = toset(var.integrator_external_services)
+  for_each            = toset(var.integrator_external_services)
   name                = "route-${split(".", each.key)[0]}-${var.env_name}"
   mesh_name           = var.env_name
   virtual_router_name = aws_appmesh_virtual_router.integrator[each.key].name
@@ -205,7 +205,7 @@ resource "aws_appmesh_virtual_node" "td_net" {
   for_each   = toset(["blue", "green"])
   name       = "vn-${var.app_name}-${var.env_name}-${each.key}"
   mesh_name  = var.app_mesh_name
-  mesh_owner = "${var.app_mesh_owner}"
+  mesh_owner = var.app_mesh_owner
   spec {
     listener {
       port_mapping {
@@ -226,7 +226,7 @@ resource "aws_appmesh_virtual_node" "td_net" {
       for_each = var.external_services
       content {
         virtual_service {
-          virtual_service_name = "${backend.value}"
+          virtual_service_name = backend.value
         }
       }
     }
@@ -250,12 +250,11 @@ resource "aws_appmesh_virtual_node" "td_net" {
 
 
 resource "aws_ecs_task_definition" "task_definition" {
-  for_each = toset(["blue","green"])
-  family                   = "${var.app_name}-${var.env_name}-${each.key}"
+  family                   = "${var.app_name}-${var.env_name}"
   task_role_arn            = aws_iam_role.ecs_task_execution_role.arn
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  container_definitions    = "${replace(data.template_file.default-container.rendered, "{BG_COLOR}", each.key)}" 
+  container_definitions    = data.template_file.default-container.rendered
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   cpu                      = var.task_definition_cpu
   memory                   = var.task_definition_memory
@@ -348,8 +347,8 @@ resource "aws_iam_role_policy_attachment" "envoy-policy-attachment" {
 }
 
 resource "aws_iam_role_policy" "app_mesh_policy" {
-  name = "policy-appmesh-${var.app_name}-${var.env_name}-${var.env_type}"
-  role = aws_iam_role.ecs_task_execution_role.name
+  name   = "policy-appmesh-${var.app_name}-${var.env_name}-${var.env_type}"
+  role   = aws_iam_role.ecs_task_execution_role.name
   policy = data.aws_iam_policy_document.appmesh_role_policy.json
 }
 
