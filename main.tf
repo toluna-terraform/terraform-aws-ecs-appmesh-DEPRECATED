@@ -388,3 +388,9 @@ resource "aws_iam_role_policy" "datadog_policy" {
     ]
   })
 }
+
+provider "aws" {
+  alias   = "app_mesh"
+  profile = "${var.app_mesh_env}"
+  region = var.region
+}
