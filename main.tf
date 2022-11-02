@@ -1,3 +1,18 @@
+locals {
+  # ECS SG rules
+  security_cidr = split(",", data.aws_ssm_parameter.security_cidr.value)
+
+  dockerLabels                  = jsonencode(var.dockerLabels)
+  app_container_environment     = jsonencode(var.app_container_environment)
+  envoy_dockerLabels            = jsonencode(var.envoy_dockerLabels)
+  envoy_container_environment   = jsonencode(var.envoy_container_environment)
+  app_container_secrets         = jsonencode(var.app_container_secrets)
+  datadog_container_secrets     = jsonencode(var.datadog_container_secrets)
+  datadog_container_environment = jsonencode(var.datadog_container_environment)
+  datadog_dockerLabels          = jsonencode(var.datadog_dockerLabels)
+}
+
+
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${var.app_name}-${var.env_name}"
 }
@@ -143,6 +158,7 @@ resource "aws_appmesh_virtual_router" "integrator" {
   for_each  = toset(var.integrator_external_services)
   name      = "vr-${split(".", each.key)[0]}-${var.env_name}"
   mesh_name = var.env_name
+  mesh_owner = var.app_mesh_owner
 
   spec {
     listener {
@@ -158,7 +174,7 @@ resource "aws_appmesh_virtual_service" "integrator" {
   for_each  = toset(var.integrator_external_services)
   name      = each.key
   mesh_name = var.env_name
-
+  mesh_owner = var.app_mesh_owner
   spec {
     provider {
       virtual_router {
@@ -172,6 +188,7 @@ resource "aws_appmesh_route" "integrators" {
   for_each            = toset(var.integrator_external_services)
   name                = "route-${split(".", each.key)[0]}-${var.env_name}"
   mesh_name           = var.env_name
+  mesh_owner          = var.app_mesh_owner 
   virtual_router_name = aws_appmesh_virtual_router.integrator[each.key].name
   spec {
     http_route {
@@ -218,7 +235,7 @@ resource "aws_appmesh_virtual_node" "td_net" {
       for_each = var.backends
       content {
         virtual_service {
-          virtual_service_name = "${backend.value}.${var.app_mesh_name}.${var.app_mesh_env}.local"
+          virtual_service_name = "${backend.value}.${var.app_mesh_name}.${var.tribe_name}.local"
         }
       }
     }
