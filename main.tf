@@ -257,38 +257,6 @@ resource "aws_appmesh_route" "integrators" {
   }
 }
 
-# resource "aws_appmesh_route" "test_route" {
-#   for_each  = toset(var.integrator_external_services)
-#   name                = "route-${split(".", each.key)[0]}-${var.env_name}-test"
-#   mesh_name           = var.env_name
-#   mesh_owner          = var.app_mesh_owner 
-#   virtual_router_name = aws_appmesh_virtual_router.integrator[each.key].name
-#   spec {
-#     priority = 1
-#     http_route {
-#       match {
-#         prefix = "/"
-#       }
-
-#       action {
-#         weighted_target {
-#           virtual_node = "vn-integrator-${var.env_name}-green"
-#           weight       = 0
-#         }
-#         weighted_target {
-#           virtual_node = "vn-integrator-${var.env_name}-blue"
-#           weight       = 100
-#         }
-#       }
-#     }
-#   }
-#   # Ignoring changes made by code_deploy controller
-#   lifecycle {
-#     ignore_changes = [
-#       spec[0].http_route[0].action
-#     ]
-#   }
-# }
 
 
 resource "aws_appmesh_virtual_node" "td_net" {
