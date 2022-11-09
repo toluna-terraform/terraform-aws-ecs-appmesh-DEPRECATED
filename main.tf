@@ -141,7 +141,7 @@ resource "aws_ecs_service" "main" {
   for_each            = toset(["blue", "green"])
   name                = "${var.app_name}-${each.key}"
   cluster             = aws_ecs_cluster.ecs_cluster.id
-  task_definition     = aws_ecs_task_definition.task_definition.arn
+  task_definition     = aws_ecs_task_definition.task_definition[each.key].arn
   launch_type         = "FARGATE"
   scheduling_strategy = "REPLICA"
   desired_count       = each.key == "green" ? var.ecs_service_desired_count : 0
@@ -312,11 +312,13 @@ resource "aws_appmesh_virtual_node" "td_net" {
 
 
 resource "aws_ecs_task_definition" "task_definition" {
-  family                   = "${var.app_name}-${var.env_name}"
+  for_each = toset(["blue","green"])
+
+  family                   = "${var.app_name}-${var.env_name}-${each.key}"
   task_role_arn            = aws_iam_role.ecs_task_execution_role.arn
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  container_definitions    = data.template_file.default-container.rendered
+  container_definitions    = "${replace(data.template_file.default-container.rendered, "{BG_COLOR}", each.key)}"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   cpu                      = var.task_definition_cpu
   memory                   = var.task_definition_memory
